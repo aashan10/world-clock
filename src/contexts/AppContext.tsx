@@ -1,0 +1,109 @@
+import { Component, createContext, useContext, batch, createEffect } from "solid-js";
+import { createStore } from "solid-js/store";
+import { TimeZone } from "../timezones";
+
+type AppState = {
+    clocks: Array<{ name: string, timezone: TimeZone }>;
+    useClientTime: boolean;
+    twelveHourFormat: boolean;
+    date: Date;
+    overlayShown: boolean
+};
+
+type AppContextType = {
+    state: AppState;
+    addClock: (name: string, timezome: TimeZone) => void;
+    removeClock: (index: number) => void;
+    setDate: (date: Date) => void;
+    setTwelveHourFormat: (value: boolean) => void;
+    showOverlay: () => void;
+    hideOverlay: () => void;
+    setUseClientTime: (value: boolean) => void;
+};
+
+export const AppContext = createContext<AppContextType>();
+
+const initialState = localStorage.getItem("clocks_settings");
+const parsedState = {
+    clocks: [],
+    useClientTime: true,
+    twelveHourFormat: false,
+    date: new Date(),
+    overlayShown: false
+};
+
+if (initialState) {
+    try {
+        const parsed = JSON.parse(initialState);
+
+        if (parsed && parsed.clocks && Array.isArray(parsed.clocks)) {
+            parsedState.clocks = parsed.clocks;
+        }
+
+        if (parsed && parsed.date && typeof parsed.date === "string") {
+            parsedState.date = new Date(parsed.date);
+        }
+
+        parsedState.useClientTime = parsed.useClientTime ?? false;
+        parsedState.twelveHourFormat = parsed.twelveHourFormat ?? false;
+        parsedState.overlayShown = parsed.overlayShown ?? false;
+    } catch (e) {
+        console.error("Failed to parse initial state from localStorage", e);
+    }
+}
+
+const [state, setState] = createStore<AppState>(parsedState);
+
+createEffect(() => {
+    localStorage.setItem("clocks_settings", JSON.stringify(state));
+});
+
+export const AppProvider: Component<{ children: any }> = (props) => {
+    const value: AppContextType = {
+        state,
+        showOverlay: () => {
+            setState("overlayShown", true);
+        },
+        hideOverlay: () => {
+            setState("overlayShown", false);
+        },
+        addClock: (name: string, timezone: TimeZone) => {
+            batch(() => {
+                setState("clocks", c => [...c, { name, timezone }]);
+                setState("overlayShown", false);
+            });
+        },
+        removeClock: (index: number) => {
+            setState("clocks", previous => previous.filter((_, i) => i !== index));
+        },
+        setDate: (date: Date) => {
+            setState("date", date);
+        },
+        setTwelveHourFormat: (value: boolean) => {
+            setState("twelveHourFormat", value);
+        },
+        setUseClientTime: (value: boolean) => {
+            setState("useClientTime", value);
+        }
+
+    };
+
+    createEffect(() => {
+        if (state.useClientTime) {
+            const currentDate = new Date();
+            setState("date", currentDate);
+        }
+    })
+
+    return (
+        <AppContext.Provider value={value}>
+            {props.children}
+        </AppContext.Provider>
+    );
+};
+
+
+
+export const useAppContext = () => {
+    return useContext(AppContext)!;
+}

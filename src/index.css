@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+
+.grow-in-enter-active,
+.grow-in-exit-active {
+  transition: all 1.2s ease-in-out;
+}
+
+.grow-in-enter-from,
+.grow-in-exit-to {
+  clip-path: circle(2rem at calc(100% - 3.25rem) calc(100% - 3.25rem));
+  opacity: 0;
+}
+
+.grow-in-enter-to,
+.grow-in-exit-from {
+  clip-path: circle(150% at calc(100% - 3.25rem) calc(100% - 3.25rem));
+  opacity: 1;
+  background-color: var(--color-teal-500); /* The final color */
+}
