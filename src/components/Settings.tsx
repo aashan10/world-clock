@@ -27,7 +27,6 @@ export const Settings: Component = () => {
 
                 <ToggleSwitch label="Use 12 hour format" checked={state.twelveHourFormat} onChange={() => { setTwelveHourFormat(!state.twelveHourFormat) }} />
 
-                <ToggleSwitch label="Use current time" checked={state.useClientTime} onChange={() => { setUseClientTime(!state.useClientTime) }} />
 
                 <ToggleSwitch label="Use Digital Clock" checked={state.clockType === "digital"} onChange={() => { toggleClockType() }} />
 
@@ -47,6 +46,8 @@ export const Settings: Component = () => {
 
                 </div>
 
+
+                <ToggleSwitch label="Use current time" checked={state.useClientTime} onChange={() => { setUseClientTime(!state.useClientTime) }} />
                 <Show when={!state.useClientTime}>
                     <div class="text-white">
                         <input value={parsedDate()} class="font-[Bungee] text-neutral-300" type="datetime-local" onChange={(e) => setDate(new Date(e.currentTarget.value))} />
