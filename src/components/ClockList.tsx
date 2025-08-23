@@ -1,6 +1,8 @@
 import { Component, For, Show } from "solid-js";
 import { useAppContext } from "../contexts/AppContext";
 import { Clock } from "./Clock";
+import { AnalogueClock } from "./AnalogueClock";
+
 
 export const ClockList: Component = () => {
     const { state } = useAppContext();
@@ -13,7 +15,14 @@ export const ClockList: Component = () => {
                 </Show>
                 <For each={state.clocks}>
                     {(clock, index) => (
-                        <Clock index={index()} timezone={clock.timezone} name={clock.name} date={state.date} />
+                        <>
+                            <Show when={state.clockType === "digital"}>
+                                <Clock index={index()} timezone={clock.timezone} name={clock.name} date={state.date} />
+                            </Show>
+                            <Show when={state.clockType === "analogue"}>
+                                <AnalogueClock index={index()} timezone={clock.timezone} name={clock.name} date={state.date} />
+                            </Show>
+                        </>
                     )}
                 </For>
             </div>

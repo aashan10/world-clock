@@ -7,7 +7,8 @@ type AppState = {
     useClientTime: boolean;
     twelveHourFormat: boolean;
     date: Date;
-    overlayShown: boolean
+    overlayShown: boolean;
+    clockType: "digital" | "analogue";
 };
 
 type AppContextType = {
@@ -19,6 +20,8 @@ type AppContextType = {
     showOverlay: () => void;
     hideOverlay: () => void;
     setUseClientTime: (value: boolean) => void;
+    setClockType: (type: "digital" | "analogue") => void;
+    toggleClockType: () => void;
 };
 
 export const AppContext = createContext<AppContextType>();
@@ -29,7 +32,8 @@ const parsedState = {
     useClientTime: true,
     twelveHourFormat: false,
     date: new Date(),
-    overlayShown: false
+    overlayShown: false,
+    clockType: "digital" as "digital" | "analogue"
 };
 
 if (initialState) {
@@ -47,6 +51,7 @@ if (initialState) {
         parsedState.useClientTime = parsed.useClientTime ?? false;
         parsedState.twelveHourFormat = parsed.twelveHourFormat ?? false;
         parsedState.overlayShown = parsed.overlayShown ?? false;
+        parsedState.clockType = parsed.clockType ?? "digital";
     } catch (e) {
         console.error("Failed to parse initial state from localStorage", e);
     }
@@ -84,14 +89,34 @@ export const AppProvider: Component<{ children: any }> = (props) => {
         },
         setUseClientTime: (value: boolean) => {
             setState("useClientTime", value);
+        },
+        setClockType: (type: "digital" | "analogue") => {
+            setState("clockType", type);
+        },
+        toggleClockType: () => {
+            setState("clockType", prev => prev === "digital" ? "analogue" : "digital");
         }
 
     };
+
+    let listener: number | undefined;
 
     createEffect(() => {
         if (state.useClientTime) {
             const currentDate = new Date();
             setState("date", currentDate);
+
+            listener = setInterval(() => {
+                if (state.useClientTime) {
+                    const currentDate = new Date();
+                    setState("date", currentDate);
+                }
+            }, 1000);
+        } else {
+            if (listener) {
+                clearInterval(listener);
+                listener = undefined;
+            }
         }
     })
 

@@ -3,7 +3,7 @@ import { useAppContext } from "../contexts/AppContext";
 import { ToggleSwitch } from "./Toggle";
 
 export const Settings: Component = () => {
-    const { state, setTwelveHourFormat, setDate, setUseClientTime } = useAppContext();
+    const { state, setTwelveHourFormat, setDate, setUseClientTime, toggleClockType } = useAppContext();
 
     const parsedDate = () => {
         const date = state.date;
@@ -16,6 +16,7 @@ export const Settings: Component = () => {
         const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
         return formattedDateTime;
     }
+
     return (
         <div class="w-full my-4 bg-neutral-900 p-4 rounded transition-all">
             <button class="cursor-pointer text-teal-500 font-[Bungee] flex flex-row gap-2 items-center">
@@ -27,6 +28,8 @@ export const Settings: Component = () => {
                 <ToggleSwitch label="Use 12 hour format" checked={state.twelveHourFormat} onChange={() => { setTwelveHourFormat(!state.twelveHourFormat) }} />
 
                 <ToggleSwitch label="Use current time" checked={state.useClientTime} onChange={() => { setUseClientTime(!state.useClientTime) }} />
+
+                <ToggleSwitch label="Use Digital Clock" checked={state.clockType === "digital"} onChange={() => { toggleClockType() }} />
 
                 <Show when={!state.useClientTime}>
                     <div class="text-white">
