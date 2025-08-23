@@ -1,4 +1,5 @@
 import { Component, createEffect, createSignal, onCleanup } from 'solid-js';
+import { useAppContext } from '../contexts/AppContext';
 
 export type TimeZone = string; // e.g., 'America/New_York', 'Europe/London', 'Asia/Tokyo'
 
@@ -10,6 +11,7 @@ export type ClockProps = {
 };
 
 const AnalogueClock: Component<ClockProps> = (props) => {
+    const { state } = useAppContext();
     const [currentTime, setCurrentTime] = createSignal(new Date());
 
     // Update time every second
@@ -118,7 +120,7 @@ const AnalogueClock: Component<ClockProps> = (props) => {
     }).filter(Boolean);
 
     return (
-        <div class="flex flex-col items-center space-y-2 p-4 dark:bg-neutral-900 rounded-lg">
+        <div class="flex flex-col items-center space-y-2 p-4 bg-neutral-50 shadow-sm dark:bg-neutral-900 rounded-lg">
             <h3 class="font-semibold text-teal-500 font-[Bungee] text-3xl">{props.name}</h3>
             <div class="relative">
                 <svg
@@ -130,7 +132,7 @@ const AnalogueClock: Component<ClockProps> = (props) => {
                         cx="50"
                         cy="50"
                         r="45"
-                        class="fill-neutral-300 dark:fill-neutral-700 stroke-neutral-500 dark:stroke-neutral-800"
+                        class="fill-neutral-200 dark:fill-neutral-700 stroke-neutral-300 dark:stroke-neutral-800"
                         stroke-width="2"
                     />
 
@@ -187,14 +189,11 @@ const AnalogueClock: Component<ClockProps> = (props) => {
             </div>
 
             {/* Digital time display */}
-            <div class="text-sm text-gray-600 font-mono">
-                {(() => {
-                    const time = getTimeInTimezone();
-                    return `${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}:${time.second.toString().padStart(2, '0')}`;
-                })()}
+            <div class="text-lg text-teal-500 font-[Bungee]">
+                {props.date.toLocaleTimeString("en-US", { timeZone: props.timezone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: state.twelveHourFormat })}
             </div>
 
-            <div class="text-xs text-gray-500">
+            <div class="text-xs text-gray-500 font-[Bungee]">
                 {props.timezone}
             </div>
         </div>

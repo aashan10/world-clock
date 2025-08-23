@@ -3,7 +3,7 @@ import { useAppContext } from "../contexts/AppContext";
 import { ToggleSwitch } from "./Toggle";
 
 export const Settings: Component = () => {
-    const { state, setTwelveHourFormat, setDate, setUseClientTime, toggleClockType } = useAppContext();
+    const { state, setTwelveHourFormat, setDate, setUseClientTime, toggleClockType, setTheme } = useAppContext();
 
     const parsedDate = () => {
         const date = state.date;
@@ -30,6 +30,22 @@ export const Settings: Component = () => {
                 <ToggleSwitch label="Use current time" checked={state.useClientTime} onChange={() => { setUseClientTime(!state.useClientTime) }} />
 
                 <ToggleSwitch label="Use Digital Clock" checked={state.clockType === "digital"} onChange={() => { toggleClockType() }} />
+
+                <div class="flex flex-row gap-4 items-center">
+                    <span class="text-white font-[Bungee]">Current Theme</span>
+
+                    <button
+                        class={`px-3 py-1 cursor-pointer rounded ${state.theme === "light" ? "bg-teal-500 text-white" : "bg-neutral-700 text-neutral-300"} font-[Bungee]`}
+                        onClick={() => { setTheme("light") }}>
+                        light
+                    </button>
+                    <button
+                        class={`px-3 py-1 cursor-pointer rounded ${state.theme === "dark" ? "bg-teal-500 text-white" : "bg-neutral-700 text-neutral-300"} font-[Bungee]`}
+                        onClick={() => { setTheme("dark") }}>
+                        dark
+                    </button>
+
+                </div>
 
                 <Show when={!state.useClientTime}>
                     <div class="text-white">

@@ -20,16 +20,6 @@ export const Clock: Component<ClockProps> = (props: ClockProps) => {
             <span class="text-neutral-500 dark:text-neutral-400 text-sm font-[Bungee]">{props.date.toLocaleDateString("en-US", { timeZone: local.timezone })}</span>
 
             <h2 class="text-neutral-500 dark:text-neutral-400 font-[Bungee] text-xl">{props.name} <span class="ml-2 text-xs">({props.timezone})</span></h2>
-
-
-            <div class="absolute top-4 right-4">
-                <button class="font-[Bungee] text-sm text-red-300 inline-flex flex-row items-center cursor-pointer w-fill" onClick={() => removeClock(local.index)}>
-                    <span class="material-symbols-outlined transform rotate-45 ">
-                        add
-                    </span>
-                    Remove
-                </button>
-            </div>
         </div>
     );
 };

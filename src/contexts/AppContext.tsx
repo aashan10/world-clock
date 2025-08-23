@@ -9,6 +9,7 @@ type AppState = {
     date: Date;
     overlayShown: boolean;
     clockType: "digital" | "analogue";
+    theme: "light" | "dark" | "system";
 };
 
 type AppContextType = {
@@ -22,6 +23,7 @@ type AppContextType = {
     setUseClientTime: (value: boolean) => void;
     setClockType: (type: "digital" | "analogue") => void;
     toggleClockType: () => void;
+    setTheme: (theme: "light" | "dark" | "system") => void;
 };
 
 export const AppContext = createContext<AppContextType>();
@@ -33,7 +35,8 @@ const parsedState = {
     twelveHourFormat: false,
     date: new Date(),
     overlayShown: false,
-    clockType: "digital" as "digital" | "analogue"
+    clockType: "digital" as "digital" | "analogue",
+    theme: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light" as "light" | "dark" | "system",
 };
 
 if (initialState) {
@@ -52,6 +55,11 @@ if (initialState) {
         parsedState.twelveHourFormat = parsed.twelveHourFormat ?? false;
         parsedState.overlayShown = parsed.overlayShown ?? false;
         parsedState.clockType = parsed.clockType ?? "digital";
+
+        if (parsed.theme) {
+            parsedState.theme = parsed.theme;
+        }
+
     } catch (e) {
         console.error("Failed to parse initial state from localStorage", e);
     }
@@ -61,6 +69,12 @@ const [state, setState] = createStore<AppState>(parsedState);
 
 createEffect(() => {
     localStorage.setItem("clocks_settings", JSON.stringify(state));
+
+    if (state.theme === "dark" || (state.theme === "system" && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add("dark");
+    } else {
+        document.documentElement.classList.remove("dark");
+    }
 });
 
 export const AppProvider: Component<{ children: any }> = (props) => {
@@ -95,8 +109,10 @@ export const AppProvider: Component<{ children: any }> = (props) => {
         },
         toggleClockType: () => {
             setState("clockType", prev => prev === "digital" ? "analogue" : "digital");
+        },
+        setTheme: (theme: "light" | "dark" | "system") => {
+            setState("theme", theme);
         }
-
     };
 
     let listener: number | undefined;
